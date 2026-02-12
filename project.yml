@@ -1,0 +1,57 @@
+name: PreventSleep
+options:
+  createIntermediateGroups: true
+  deploymentTarget:
+    macOS: "15.0"
+settings:
+  base:
+    SWIFT_VERSION: 6.0
+targets:
+  PreventSleep:
+    type: application
+    platform: macOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: PreventSleep
+        excludes:
+          - Scripts/install_privileged_access.sh
+    resources:
+      - path: PreventSleep/Scripts/install_privileged_access.sh
+    info:
+      path: PreventSleep/Info.plist
+      properties:
+        LSUIElement: true
+        NSAppleEventsUsageDescription: "PreventSleep requests administrator access only when you enable privileged lid-delay support."
+    settings:
+      base:
+        INFOPLIST_FILE: PreventSleep/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.jeremiah.preventsleep
+        CODE_SIGN_STYLE: Automatic
+        OTHER_LDFLAGS:
+          - -lproc
+  PreventSleepTests:
+    type: bundle.unit-test
+    platform: macOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: PreventSleepTests
+    dependencies:
+      - target: PreventSleep
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.jeremiah.preventsleep.tests
+        CODE_SIGN_STYLE: Automatic
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/PreventSleep.app/Contents/MacOS/PreventSleep"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        OTHER_LDFLAGS:
+          - -lproc
+schemes:
+  PreventSleep:
+    build:
+      targets:
+        PreventSleep: all
+        PreventSleepTests: [test]
+    test:
+      targets:
+        - PreventSleepTests

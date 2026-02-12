@@ -1,0 +1,499 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		04FF95894F07041FD26DE63F /* RuleModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA9D2AF511D1C48ABD56061 /* RuleModels.swift */; };
+		193703973313A1CA4D4F41FD /* PrivilegedPowerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72038A182E4EEA93125F519C /* PrivilegedPowerController.swift */; };
+		1CB4A6C1250068741E423731 /* LidDelayLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4926A21E726D0039CA17E557 /* LidDelayLogicTests.swift */; };
+		389DE5A3A31E48BA74D4AD2A /* SleepAssertionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB110A05EC078D7698946549 /* SleepAssertionController.swift */; };
+		4820F5706077DE7600B9B7C6 /* RuleMatchingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8B1C49DAD8932C320EADCC /* RuleMatchingTests.swift */; };
+		48DBA50A3116E2B7DC8D50AA /* TimerModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7325671CE837D85BAEC1E76 /* TimerModels.swift */; };
+		69867831EB0E7C7FA329C70A /* LoginItemController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4914B762B4A804E9331A6CD /* LoginItemController.swift */; };
+		6CF10184F857D7CFE2DBA18F /* PreventSleepApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA7D3C39C8C211C33E2D0B6 /* PreventSleepApp.swift */; };
+		6EBEA55368AF799B49EF3933 /* AppStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A93D1279AD464F7CF604FA40 /* AppStateTests.swift */; };
+		95E8F60F0C663B992AFD5AAC /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D18162CD02DDDBB1BAC798DD /* AppState.swift */; };
+		9CF3079CD9B158C29A434E4E /* MenuContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F924447426BF488271AAB6 /* MenuContentView.swift */; };
+		B8D966C599DD28865B25B80C /* WindowScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF9E585EAE1F363DD552D172 /* WindowScanner.swift */; };
+		C737748373D173E5E298727A /* RuleStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1ABE57AD764D13C57CDC8D /* RuleStore.swift */; };
+		D73559D1B57FDB3B50521F6C /* TestDoubles.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B17D2EFE5F0E893DA3BD40 /* TestDoubles.swift */; };
+		E26175204BA8FA81EB250398 /* LidStateMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 933278E03CE988BA93801169 /* LidStateMonitor.swift */; };
+		E40314E3D9DDC589E0701CD0 /* ProcessScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5EEF96568776107FD66B9E /* ProcessScanner.swift */; };
+		FDD3F43454EF43CA33DE0A99 /* AdvancedSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A3C789AE38AF116FC4C9392 /* AdvancedSettingsView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		97584BCE17CC7906C72C3F89 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EFB7A359C0B334BD2D9CACAC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3C0EBB0365927A4BA85DBB58;
+			remoteInfo = PreventSleep;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0A3C789AE38AF116FC4C9392 /* AdvancedSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsView.swift; sourceTree = "<group>"; };
+		3A5EEF96568776107FD66B9E /* ProcessScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessScanner.swift; sourceTree = "<group>"; };
+		3F1ABE57AD764D13C57CDC8D /* RuleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleStore.swift; sourceTree = "<group>"; };
+		3FEAA615AF3D71AA266CE29A /* PreventSleepTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PreventSleepTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4926A21E726D0039CA17E557 /* LidDelayLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LidDelayLogicTests.swift; sourceTree = "<group>"; };
+		4DA9D2AF511D1C48ABD56061 /* RuleModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleModels.swift; sourceTree = "<group>"; };
+		53F924447426BF488271AAB6 /* MenuContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuContentView.swift; sourceTree = "<group>"; };
+		6D8B1C49DAD8932C320EADCC /* RuleMatchingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleMatchingTests.swift; sourceTree = "<group>"; };
+		72038A182E4EEA93125F519C /* PrivilegedPowerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivilegedPowerController.swift; sourceTree = "<group>"; };
+		7CC482E81F5C501C4980E021 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		933278E03CE988BA93801169 /* LidStateMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LidStateMonitor.swift; sourceTree = "<group>"; };
+		96C5F08B630C6600EF720AB9 /* PreventSleep.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PreventSleep.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A93D1279AD464F7CF604FA40 /* AppStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateTests.swift; sourceTree = "<group>"; };
+		B4914B762B4A804E9331A6CD /* LoginItemController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemController.swift; sourceTree = "<group>"; };
+		B7B17D2EFE5F0E893DA3BD40 /* TestDoubles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestDoubles.swift; sourceTree = "<group>"; };
+		BDA7D3C39C8C211C33E2D0B6 /* PreventSleepApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreventSleepApp.swift; sourceTree = "<group>"; };
+		C7325671CE837D85BAEC1E76 /* TimerModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerModels.swift; sourceTree = "<group>"; };
+		D18162CD02DDDBB1BAC798DD /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		DF9E585EAE1F363DD552D172 /* WindowScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowScanner.swift; sourceTree = "<group>"; };
+		FB110A05EC078D7698946549 /* SleepAssertionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepAssertionController.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		2727E902D8A76F9E2CE2F97D /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				D18162CD02DDDBB1BAC798DD /* AppState.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		53D60DB32955CE39CF20A0EE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				96C5F08B630C6600EF720AB9 /* PreventSleep.app */,
+				3FEAA615AF3D71AA266CE29A /* PreventSleepTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5E690C3241291715E40145D0 /* PreventSleepTests */ = {
+			isa = PBXGroup;
+			children = (
+				A93D1279AD464F7CF604FA40 /* AppStateTests.swift */,
+				4926A21E726D0039CA17E557 /* LidDelayLogicTests.swift */,
+				6D8B1C49DAD8932C320EADCC /* RuleMatchingTests.swift */,
+				B7B17D2EFE5F0E893DA3BD40 /* TestDoubles.swift */,
+			);
+			path = PreventSleepTests;
+			sourceTree = "<group>";
+		};
+		8A76598D0DDD58DC130AD887 /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				4DA9D2AF511D1C48ABD56061 /* RuleModels.swift */,
+				C7325671CE837D85BAEC1E76 /* TimerModels.swift */,
+			);
+			path = Domain;
+			sourceTree = "<group>";
+		};
+		9D07E9F3615D92136CE3FFD1 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				0A3C789AE38AF116FC4C9392 /* AdvancedSettingsView.swift */,
+				53F924447426BF488271AAB6 /* MenuContentView.swift */,
+				BDA7D3C39C8C211C33E2D0B6 /* PreventSleepApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		AD587BD5BA0DCCE6D54D8CF3 /* PreventSleep */ = {
+			isa = PBXGroup;
+			children = (
+				7CC482E81F5C501C4980E021 /* Info.plist */,
+				9D07E9F3615D92136CE3FFD1 /* App */,
+				8A76598D0DDD58DC130AD887 /* Domain */,
+				DA9DD9D055D306B20151C08C /* Services */,
+				2727E902D8A76F9E2CE2F97D /* ViewModel */,
+			);
+			path = PreventSleep;
+			sourceTree = "<group>";
+		};
+		DA9DD9D055D306B20151C08C /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				933278E03CE988BA93801169 /* LidStateMonitor.swift */,
+				B4914B762B4A804E9331A6CD /* LoginItemController.swift */,
+				72038A182E4EEA93125F519C /* PrivilegedPowerController.swift */,
+				3A5EEF96568776107FD66B9E /* ProcessScanner.swift */,
+				3F1ABE57AD764D13C57CDC8D /* RuleStore.swift */,
+				FB110A05EC078D7698946549 /* SleepAssertionController.swift */,
+				DF9E585EAE1F363DD552D172 /* WindowScanner.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		F4F5CE02672508E57BA323C1 = {
+			isa = PBXGroup;
+			children = (
+				AD587BD5BA0DCCE6D54D8CF3 /* PreventSleep */,
+				5E690C3241291715E40145D0 /* PreventSleepTests */,
+				53D60DB32955CE39CF20A0EE /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		12A824165890B04B8E3E2606 /* PreventSleepTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E28FD2249AE73A74BCE02DF0 /* Build configuration list for PBXNativeTarget "PreventSleepTests" */;
+			buildPhases = (
+				8D3C60FC82BE7531E245D7FB /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				EA0D7F18F246B8CC14B97CBB /* PBXTargetDependency */,
+			);
+			name = PreventSleepTests;
+			packageProductDependencies = (
+			);
+			productName = PreventSleepTests;
+			productReference = 3FEAA615AF3D71AA266CE29A /* PreventSleepTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		3C0EBB0365927A4BA85DBB58 /* PreventSleep */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5829E76090258C973553943E /* Build configuration list for PBXNativeTarget "PreventSleep" */;
+			buildPhases = (
+				75962630D64526E779D568AC /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PreventSleep;
+			packageProductDependencies = (
+			);
+			productName = PreventSleep;
+			productReference = 96C5F08B630C6600EF720AB9 /* PreventSleep.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		EFB7A359C0B334BD2D9CACAC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					12A824165890B04B8E3E2606 = {
+						ProvisioningStyle = Automatic;
+					};
+					3C0EBB0365927A4BA85DBB58 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 386236C384A12F28E827A462 /* Build configuration list for PBXProject "PreventSleep" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = F4F5CE02672508E57BA323C1;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3C0EBB0365927A4BA85DBB58 /* PreventSleep */,
+				12A824165890B04B8E3E2606 /* PreventSleepTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		75962630D64526E779D568AC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FDD3F43454EF43CA33DE0A99 /* AdvancedSettingsView.swift in Sources */,
+				95E8F60F0C663B992AFD5AAC /* AppState.swift in Sources */,
+				E26175204BA8FA81EB250398 /* LidStateMonitor.swift in Sources */,
+				69867831EB0E7C7FA329C70A /* LoginItemController.swift in Sources */,
+				9CF3079CD9B158C29A434E4E /* MenuContentView.swift in Sources */,
+				6CF10184F857D7CFE2DBA18F /* PreventSleepApp.swift in Sources */,
+				193703973313A1CA4D4F41FD /* PrivilegedPowerController.swift in Sources */,
+				E40314E3D9DDC589E0701CD0 /* ProcessScanner.swift in Sources */,
+				04FF95894F07041FD26DE63F /* RuleModels.swift in Sources */,
+				C737748373D173E5E298727A /* RuleStore.swift in Sources */,
+				389DE5A3A31E48BA74D4AD2A /* SleepAssertionController.swift in Sources */,
+				48DBA50A3116E2B7DC8D50AA /* TimerModels.swift in Sources */,
+				B8D966C599DD28865B25B80C /* WindowScanner.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D3C60FC82BE7531E245D7FB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6EBEA55368AF799B49EF3933 /* AppStateTests.swift in Sources */,
+				1CB4A6C1250068741E423731 /* LidDelayLogicTests.swift in Sources */,
+				4820F5706077DE7600B9B7C6 /* RuleMatchingTests.swift in Sources */,
+				D73559D1B57FDB3B50521F6C /* TestDoubles.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		EA0D7F18F246B8CC14B97CBB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3C0EBB0365927A4BA85DBB58 /* PreventSleep */;
+			targetProxy = 97584BCE17CC7906C72C3F89 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0ECDEE11AE0C511ACEAC7F25 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		1B16FB50FCF86123BF0B5376 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = PreventSleep/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				OTHER_LDFLAGS = (
+					"-lproc",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jeremiah.preventsleep;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		25F7491525FA4EC64C39F397 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				OTHER_LDFLAGS = (
+					"-lproc",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jeremiah.preventsleep.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PreventSleep.app/Contents/MacOS/PreventSleep";
+			};
+			name = Release;
+		};
+		4FF254417EB68EC6E215DD8B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = PreventSleep/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				OTHER_LDFLAGS = (
+					"-lproc",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jeremiah.preventsleep;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		90BDCC5EA42CB7595B00D617 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				OTHER_LDFLAGS = (
+					"-lproc",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jeremiah.preventsleep.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PreventSleep.app/Contents/MacOS/PreventSleep";
+			};
+			name = Debug;
+		};
+		B2BACBF4FB4107DB0E64857F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		386236C384A12F28E827A462 /* Build configuration list for PBXProject "PreventSleep" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0ECDEE11AE0C511ACEAC7F25 /* Debug */,
+				B2BACBF4FB4107DB0E64857F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		5829E76090258C973553943E /* Build configuration list for PBXNativeTarget "PreventSleep" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1B16FB50FCF86123BF0B5376 /* Debug */,
+				4FF254417EB68EC6E215DD8B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E28FD2249AE73A74BCE02DF0 /* Build configuration list for PBXNativeTarget "PreventSleepTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				90BDCC5EA42CB7595B00D617 /* Debug */,
+				25F7491525FA4EC64C39F397 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = EFB7A359C0B334BD2D9CACAC /* Project object */;
+}
