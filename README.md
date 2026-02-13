@@ -6,6 +6,10 @@ PreventSleep is a macOS menu bar app that keeps your Mac awake based on manual c
 - UI: SwiftUI menu bar extra (`LSUIElement` app, no Dock icon)
 - Project type: Xcode / XcodeGen-compatible (`project.yml` + generated `.xcodeproj`)
 
+## Screenshot
+
+![PreventSleep screenshot](screenshot.png)
+
 ## Features
 
 - `Prevent Sleep Indefinitely` toggle from the menu bar.
