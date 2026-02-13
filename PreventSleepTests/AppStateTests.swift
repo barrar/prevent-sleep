@@ -143,7 +143,10 @@ final class AppStateTests: XCTestCase {
     func testRuleAllowsSleepAfterFiveMinuteCPUPeakFallsBelowThreshold() {
         let clock = TestClock(startingAt: Date(timeIntervalSince1970: 1_700_000_000))
         let cpuSampler = MockCPUSampler()
-        cpuSampler.queuedSamples = [12, 1]
+        cpuSampler.queuedSnapshots = [
+            CPUUsageSnapshot(systemPercent: 25, pidPercentages: [42: 12]),
+            CPUUsageSnapshot(systemPercent: 20, pidPercentages: [42: 1])
+        ]
 
         let processScanner = MockProcessScanner()
         processScanner.processes = [
@@ -186,10 +189,63 @@ final class AppStateTests: XCTestCase {
         XCTAssertFalse(appState.isSleepCurrentlyPrevented)
     }
 
+    func testRuleCPUThresholdUsesOnlyTotalForMatchedPIDs() {
+        let clock = TestClock(startingAt: Date(timeIntervalSince1970: 1_700_050_000))
+        let cpuSampler = MockCPUSampler()
+        cpuSampler.queuedSnapshots = [
+            CPUUsageSnapshot(systemPercent: 1, pidPercentages: [42: 1.3, 43: 1.2]),
+            CPUUsageSnapshot(systemPercent: 1, pidPercentages: [42: 1.1, 43: 1.1])
+        ]
+
+        let processScanner = MockProcessScanner()
+        processScanner.processes = [
+            ProcessSnapshot(executablePath: "/opt/homebrew/bin/node", processName: "node", pids: [42, 43])
+        ]
+
+        let rule = SleepRule(
+            label: "Node",
+            matchMode: .processName,
+            matchValue: "node",
+            preventWhileMatched: true,
+            allowSleepWhenCPUPeakDropsBelowThreshold: true,
+            cpuUsageThresholdPercent: 2
+        )
+
+        let store = InMemoryRuleStore(state: PersistedState(
+            globalSettings: .default,
+            rules: [rule],
+            lidOverrideActive: false
+        ))
+
+        let appState = AppState(
+            sleepController: MockSleepAssertionController(),
+            processScanner: processScanner,
+            windowScanner: MockWindowScanner(),
+            cpuSampler: cpuSampler,
+            lidMonitor: MockLidMonitor(),
+            privilegedPowerController: MockPrivilegedPowerController(),
+            ruleStore: store,
+            loginItemController: MockLoginItemController(),
+            nowProvider: { clock.now },
+            autoStartMonitoring: false
+        )
+
+        XCTAssertTrue(appState.isSleepCurrentlyPrevented)
+
+        clock.advance(seconds: 301)
+        appState.refreshNow()
+
+        XCTAssertTrue(appState.isSleepCurrentlyPrevented)
+    }
+
     func testCurrentOneMinutePeakCPUIsPublishedForRuleEditor() {
         let clock = TestClock(startingAt: Date(timeIntervalSince1970: 1_700_100_000))
         let cpuSampler = MockCPUSampler()
-        cpuSampler.queuedSamples = [3, 11, 4]
+        cpuSampler.queuedSnapshots = [
+            CPUUsageSnapshot(systemPercent: 3, pidPercentages: [:]),
+            CPUUsageSnapshot(systemPercent: 11, pidPercentages: [:]),
+            CPUUsageSnapshot(systemPercent: 4, pidPercentages: [:])
+        ]
 
         let appState = AppState(
             sleepController: MockSleepAssertionController(),
@@ -204,15 +260,46 @@ final class AppStateTests: XCTestCase {
             autoStartMonitoring: false
         )
 
-        XCTAssertEqual(appState.currentPeakCPUUsageLastMinutePercent ?? -1, 3, accuracy: 0.0001)
+        XCTAssertEqual(appState.currentSystemPeakCPUUsageLastMinutePercent ?? -1, 3, accuracy: 0.0001)
 
         clock.advance(seconds: 30)
         appState.refreshNow()
-        XCTAssertEqual(appState.currentPeakCPUUsageLastMinutePercent ?? -1, 11, accuracy: 0.0001)
+        XCTAssertEqual(appState.currentSystemPeakCPUUsageLastMinutePercent ?? -1, 11, accuracy: 0.0001)
 
         clock.advance(seconds: 40)
         appState.refreshNow()
-        XCTAssertEqual(appState.currentPeakCPUUsageLastMinutePercent ?? -1, 11, accuracy: 0.0001)
+        XCTAssertEqual(appState.currentSystemPeakCPUUsageLastMinutePercent ?? -1, 11, accuracy: 0.0001)
+    }
+
+    func testGlobalCPUAllowanceCanReleaseSleepPreventionWhenSystemCPUFallsBelowThreshold() {
+        let clock = TestClock(startingAt: Date(timeIntervalSince1970: 1_700_200_000))
+        let cpuSampler = MockCPUSampler()
+        cpuSampler.queuedSnapshots = [
+            CPUUsageSnapshot(systemPercent: 15, pidPercentages: [:]),
+            CPUUsageSnapshot(systemPercent: 1, pidPercentages: [:])
+        ]
+
+        let appState = AppState(
+            sleepController: MockSleepAssertionController(),
+            processScanner: MockProcessScanner(),
+            windowScanner: MockWindowScanner(),
+            cpuSampler: cpuSampler,
+            lidMonitor: MockLidMonitor(),
+            privilegedPowerController: MockPrivilegedPowerController(),
+            ruleStore: InMemoryRuleStore(),
+            loginItemController: MockLoginItemController(),
+            nowProvider: { clock.now },
+            autoStartMonitoring: false
+        )
+
+        appState.setPreventIndefinitely(true)
+        appState.setGlobalCPUAllowance(enabled: true, thresholdPercent: 2)
+        XCTAssertTrue(appState.isSleepCurrentlyPrevented)
+
+        clock.advance(seconds: 301)
+        appState.refreshNow()
+
+        XCTAssertFalse(appState.isSleepCurrentlyPrevented)
     }
 
     func testDeleteLastRuleRemovesItFromStateAndPersistence() {

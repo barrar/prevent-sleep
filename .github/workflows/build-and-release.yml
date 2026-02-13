@@ -1,0 +1,61 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: xcodebuild -project PreventSleep.xcodeproj -scheme PreventSleep -configuration Debug -destination 'platform=macOS' build
+
+      - name: Test
+        run: xcodebuild -project PreventSleep.xcodeproj -scheme PreventSleep -configuration Debug -destination 'platform=macOS' test
+
+  release:
+    name: Create Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build-and-test
+    runs-on: macos-15
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Release App
+        run: |
+          xcodebuild -project PreventSleep.xcodeproj \
+            -scheme PreventSleep \
+            -configuration Release \
+            -destination 'platform=macOS' \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Package App
+        run: |
+          APP_PATH="build/DerivedData/Build/Products/Release/PreventSleep.app"
+          ZIP_PATH="PreventSleep-macOS.zip"
+          if [ ! -d "$APP_PATH" ]; then
+            echo "Expected app bundle not found at $APP_PATH"
+            exit 1
+          fi
+          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$ZIP_PATH"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: PreventSleep-macOS.zip
+          generate_release_notes: true

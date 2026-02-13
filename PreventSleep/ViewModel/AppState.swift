@@ -33,7 +33,7 @@ final class AppState: ObservableObject {
     @Published private(set) var screenRecordingStatusMessage: String = "Screen Recording status not checked yet."
     @Published private(set) var privilegedSetupInProgress: Bool = false
     @Published private(set) var lastErrorMessage: String?
-    @Published private(set) var currentPeakCPUUsageLastMinutePercent: Double?
+    @Published private(set) var currentSystemPeakCPUUsageLastMinutePercent: Double?
 
     private let sleepController: SleepAssertionControlling
     private let processScanner: ProcessScanning
@@ -59,7 +59,8 @@ final class AppState: ObservableObject {
     private var previousMatchState: [UUID: Bool] = [:]
     private var lidDelayReleaseDate: Date?
     private var lidOverrideEngaged: Bool = false
-    private var cpuUsageHistory: [CPUSample] = []
+    private var systemCPUUsageHistory: [CPUSample] = []
+    private var ruleCPUUsageHistoryByRuleID: [UUID: [CPUSample]] = [:]
 
     private let cpuPeakWindowForDisplaySeconds: TimeInterval = 60
     private let cpuPeakWindowForRuleReleaseSeconds: TimeInterval = 5 * 60
@@ -157,6 +158,14 @@ final class AppState: ObservableObject {
         matchedRuleDetailsByRuleID[ruleID] ?? []
     }
 
+    func rulePeakCPUUsageLastMinutePercent(for ruleID: UUID) -> Double? {
+        peakCPUUsage(
+            in: ruleCPUUsageHistoryByRuleID[ruleID] ?? [],
+            within: cpuPeakWindowForDisplaySeconds,
+            at: nowProvider()
+        )
+    }
+
     func isProcessWatched(_ process: ProcessSnapshot) -> Bool {
         let normalized = normalizeMatchValue(process.executablePath)
         return rules.contains { rule in
@@ -212,6 +221,7 @@ final class AppState: ObservableObject {
             if !rules[index].enabled {
                 postExitTimerEndDates.removeValue(forKey: rules[index].id)
                 previousMatchState[rules[index].id] = false
+                ruleCPUUsageHistoryByRuleID.removeValue(forKey: rules[index].id)
             }
             return
         }
@@ -234,6 +244,7 @@ final class AppState: ObservableObject {
         rules[index].enabled = false
         postExitTimerEndDates.removeValue(forKey: ruleID)
         previousMatchState[ruleID] = false
+        ruleCPUUsageHistoryByRuleID.removeValue(forKey: ruleID)
     }
 
     func addRule() {
@@ -262,6 +273,7 @@ final class AppState: ObservableObject {
         rules.removeAll { $0.id == ruleID }
         postExitTimerEndDates.removeValue(forKey: ruleID)
         previousMatchState.removeValue(forKey: ruleID)
+        ruleCPUUsageHistoryByRuleID.removeValue(forKey: ruleID)
     }
 
     func setDefaultRuleMatchMode(_ mode: MatchMode) {
@@ -271,6 +283,11 @@ final class AppState: ObservableObject {
     func setGlobalLidDelay(enabled: Bool, seconds: TimeInterval) {
         globalSettings.globalLidDelayEnabled = enabled
         globalSettings.globalLidDelaySeconds = max(seconds, 0)
+    }
+
+    func setGlobalCPUAllowance(enabled: Bool, thresholdPercent: Double) {
+        globalSettings.allowSleepWhenSystemCPUBelowThreshold = enabled
+        globalSettings.systemCPUUsageThresholdPercent = max(thresholdPercent, 0)
     }
 
     func installPrivilegedAccess() {
@@ -338,13 +355,13 @@ final class AppState: ObservableObject {
         refreshScreenRecordingAccessStatus()
         runningProcesses = processScanner.scanUserProcesses()
         visibleWindows = windowScanner.scanVisibleWindows()
-        recordCPUSample()
         reevaluateMatchesAndTimers()
+        recordCPUSamples()
         reevaluateState()
     }
 
     private func tick() {
-        updatePublishedCPUPeak(now: nowProvider())
+        updatePublishedSystemCPUPeak(now: nowProvider())
         expireTimersIfNeeded()
         handleLidDelayIfNeeded()
         reevaluateState()
@@ -385,6 +402,8 @@ final class AppState: ObservableObject {
 
             if isMatched {
                 postExitTimerEndDates.removeValue(forKey: rule.id)
+            } else {
+                ruleCPUUsageHistoryByRuleID.removeValue(forKey: rule.id)
             }
 
             previousMatchState[rule.id] = isMatched
@@ -397,6 +416,7 @@ final class AppState: ObservableObject {
         let enabledRuleIDs = Set(rules.filter(\.enabled).map(\.id))
         matchedRuleIDs = matchedRuleIDs.intersection(enabledRuleIDs)
         matchedRuleDetailsByRuleID = matchedRuleDetailsByRuleID.filter { enabledRuleIDs.contains($0.key) }
+        ruleCPUUsageHistoryByRuleID = ruleCPUUsageHistoryByRuleID.filter { enabledRuleIDs.contains($0.key) }
         previousMatchState = previousMatchState.filter { enabledRuleIDs.contains($0.key) }
         postExitTimerEndDates = postExitTimerEndDates.filter { enabledRuleIDs.contains($0.key) }
     }
@@ -409,7 +429,14 @@ final class AppState: ObservableObject {
         }
         let postExitActive = postExitTimerEndDates.values.contains { $0 > now }
 
-        let shouldPrevent = globalSettings.preventIndefinitely || manualTimerActive || matchingPreventRuleActive || postExitActive
+        var shouldPrevent = globalSettings.preventIndefinitely || manualTimerActive || matchingPreventRuleActive || postExitActive
+        if shouldPrevent,
+           globalSettings.allowSleepWhenSystemCPUBelowThreshold,
+           let systemPeak = peakCPUUsage(in: systemCPUUsageHistory, within: cpuPeakWindowForRuleReleaseSeconds, at: now),
+           systemPeak < globalSettings.systemCPUUsageThresholdPercent {
+            shouldPrevent = false
+        }
+
         isSleepCurrentlyPrevented = shouldPrevent
         sleepController.update(isNeeded: shouldPrevent, mode: globalSettings.sleepMode)
     }
@@ -417,33 +444,66 @@ final class AppState: ObservableObject {
     private func shouldPreventSleepForMatchedRule(_ rule: SleepRule, at now: Date) -> Bool {
         guard rule.enabled, rule.preventWhileMatched, matchedRuleIDs.contains(rule.id) else { return false }
         guard rule.allowSleepWhenCPUPeakDropsBelowThreshold else { return true }
-        guard let peak = peakCPUUsage(within: cpuPeakWindowForRuleReleaseSeconds, at: now) else { return true }
+        let ruleHistory = ruleCPUUsageHistoryByRuleID[rule.id] ?? []
+        guard let peak = peakCPUUsage(in: ruleHistory, within: cpuPeakWindowForRuleReleaseSeconds, at: now) else {
+            return true
+        }
         return peak >= max(rule.cpuUsageThresholdPercent, 0)
     }
 
-    private func recordCPUSample() {
+    private func recordCPUSamples() {
         let now = nowProvider()
-        if let cpuPercent = cpuSampler.sampleSystemCPUPercent() {
-            cpuUsageHistory.append(CPUSample(timestamp: now, percent: max(cpuPercent, 0)))
+        let matchedPIDs = Set(matchedRuleDetailsByRuleID.values.flatMap { $0.map(\.pid) })
+        let cpuUsageSnapshot = cpuSampler.sampleCPUUsage(forPIDs: matchedPIDs)
+
+        if let systemPercent = cpuUsageSnapshot.systemPercent {
+            systemCPUUsageHistory.append(CPUSample(timestamp: now, percent: max(systemPercent, 0)))
         }
+
+        for (ruleID, details) in matchedRuleDetailsByRuleID {
+            let pids = Set(details.map(\.pid))
+            var total: Double = 0
+            var hasSample = false
+
+            for pid in pids {
+                guard let pidPercent = cpuUsageSnapshot.pidPercentages[pid] else { continue }
+                total += max(pidPercent, 0)
+                hasSample = true
+            }
+
+            guard hasSample else { continue }
+            ruleCPUUsageHistoryByRuleID[ruleID, default: []].append(CPUSample(timestamp: now, percent: total))
+        }
+
         pruneCPUHistory(now: now)
-        updatePublishedCPUPeak(now: now)
+        updatePublishedSystemCPUPeak(now: now)
     }
 
     private func pruneCPUHistory(now: Date) {
         let maxWindow = max(cpuPeakWindowForDisplaySeconds, cpuPeakWindowForRuleReleaseSeconds)
         let cutoff = now.addingTimeInterval(-maxWindow)
-        cpuUsageHistory.removeAll { $0.timestamp < cutoff }
+
+        systemCPUUsageHistory.removeAll { $0.timestamp < cutoff }
+        ruleCPUUsageHistoryByRuleID = ruleCPUUsageHistoryByRuleID.reduce(into: [:]) { result, pair in
+            let filtered = pair.value.filter { $0.timestamp >= cutoff }
+            if !filtered.isEmpty {
+                result[pair.key] = filtered
+            }
+        }
     }
 
-    private func updatePublishedCPUPeak(now: Date) {
+    private func updatePublishedSystemCPUPeak(now: Date) {
         pruneCPUHistory(now: now)
-        currentPeakCPUUsageLastMinutePercent = peakCPUUsage(within: cpuPeakWindowForDisplaySeconds, at: now)
+        currentSystemPeakCPUUsageLastMinutePercent = peakCPUUsage(
+            in: systemCPUUsageHistory,
+            within: cpuPeakWindowForDisplaySeconds,
+            at: now
+        )
     }
 
-    private func peakCPUUsage(within seconds: TimeInterval, at now: Date) -> Double? {
+    private func peakCPUUsage(in history: [CPUSample], within seconds: TimeInterval, at now: Date) -> Double? {
         let cutoff = now.addingTimeInterval(-seconds)
-        return cpuUsageHistory.reduce(into: nil as Double?) { peak, sample in
+        return history.reduce(into: nil as Double?) { peak, sample in
             guard sample.timestamp >= cutoff else { return }
             if let currentPeak = peak {
                 peak = max(currentPeak, sample.percent)
@@ -755,7 +815,12 @@ final class AppState: ObservableObject {
 }
 
 protocol CPUUsageSampling {
-    func sampleSystemCPUPercent() -> Double?
+    func sampleCPUUsage(forPIDs pids: Set<Int32>) -> CPUUsageSnapshot
+}
+
+struct CPUUsageSnapshot {
+    let systemPercent: Double?
+    let pidPercentages: [Int32: Double]
 }
 
 private struct CPUSample {
@@ -764,32 +829,52 @@ private struct CPUSample {
 }
 
 final class SystemCPUSampler: CPUUsageSampling {
-    private var previousTicks: [UInt32]?
+    private let processorCount: Double
 
-    func sampleSystemCPUPercent() -> Double? {
-        var loadInfo = host_cpu_load_info()
-        var count = mach_msg_type_number_t(MemoryLayout<host_cpu_load_info_data_t>.stride / MemoryLayout<integer_t>.stride)
+    private var previousSystemTicks: [UInt32]?
+    private var previousTimestamp: Date?
+    private var previousCPUTimeByPID: [Int32: UInt64] = [:]
 
-        let status = withUnsafeMutablePointer(to: &loadInfo) { pointer in
-            pointer.withMemoryRebound(to: integer_t.self, capacity: Int(count)) { reboundPointer in
-                host_statistics(mach_host_self(), HOST_CPU_LOAD_INFO, reboundPointer, &count)
+    init(processorCount: Int = ProcessInfo.processInfo.processorCount) {
+        self.processorCount = max(Double(processorCount), 1)
+    }
+
+    func sampleCPUUsage(forPIDs pids: Set<Int32>) -> CPUUsageSnapshot {
+        let now = Date()
+        let systemPercent = sampleSystemCPUPercent()
+
+        let currentCPUTimeByPID = cpuTimeByPID(for: pids)
+        var pidPercentages: [Int32: Double] = [:]
+
+        if let previousTimestamp {
+            let elapsedSeconds = now.timeIntervalSince(previousTimestamp)
+            if elapsedSeconds > 0 {
+                let totalCapacityNanos = elapsedSeconds * 1_000_000_000 * processorCount
+                if totalCapacityNanos > 0 {
+                    for (pid, currentCPUTimeNanos) in currentCPUTimeByPID {
+                        guard let previousCPUTimeNanos = previousCPUTimeByPID[pid] else { continue }
+                        guard currentCPUTimeNanos >= previousCPUTimeNanos else { continue }
+
+                        let deltaNanos = Double(currentCPUTimeNanos - previousCPUTimeNanos)
+                        pidPercentages[pid] = max((deltaNanos / totalCapacityNanos) * 100, 0)
+                    }
+                }
             }
         }
 
-        guard status == KERN_SUCCESS else { return nil }
+        previousCPUTimeByPID = currentCPUTimeByPID
+        previousTimestamp = now
 
-        let currentTicks: [UInt32] = [
-            UInt32(loadInfo.cpu_ticks.0),
-            UInt32(loadInfo.cpu_ticks.1),
-            UInt32(loadInfo.cpu_ticks.2),
-            UInt32(loadInfo.cpu_ticks.3)
-        ]
+        return CPUUsageSnapshot(systemPercent: systemPercent, pidPercentages: pidPercentages)
+    }
 
-        defer { previousTicks = currentTicks }
+    private func sampleSystemCPUPercent() -> Double? {
+        guard let currentTicks = systemCPUTicks() else { return nil }
+        defer { previousSystemTicks = currentTicks }
 
-        guard let previousTicks else { return nil }
+        guard let previousSystemTicks else { return nil }
 
-        let deltas = zip(currentTicks, previousTicks).map { current, previous -> Double in
+        let deltas = zip(currentTicks, previousSystemTicks).map { current, previous -> Double in
             guard current >= previous else { return 0 }
             return Double(current - previous)
         }
@@ -799,5 +884,45 @@ final class SystemCPUSampler: CPUUsageSampling {
 
         let active = deltas[Int(CPU_STATE_USER)] + deltas[Int(CPU_STATE_SYSTEM)] + deltas[Int(CPU_STATE_NICE)]
         return max(min((active / total) * 100, 100), 0)
+    }
+
+    private func systemCPUTicks() -> [UInt32]? {
+        var loadInfo = host_cpu_load_info()
+        var count = mach_msg_type_number_t(
+            MemoryLayout<host_cpu_load_info_data_t>.stride / MemoryLayout<integer_t>.stride
+        )
+
+        let status = withUnsafeMutablePointer(to: &loadInfo) { pointer in
+            pointer.withMemoryRebound(to: integer_t.self, capacity: Int(count)) { reboundPointer in
+                host_statistics(mach_host_self(), HOST_CPU_LOAD_INFO, reboundPointer, &count)
+            }
+        }
+
+        guard status == KERN_SUCCESS else { return nil }
+
+        return [
+            UInt32(loadInfo.cpu_ticks.0),
+            UInt32(loadInfo.cpu_ticks.1),
+            UInt32(loadInfo.cpu_ticks.2),
+            UInt32(loadInfo.cpu_ticks.3)
+        ]
+    }
+
+    private func cpuTimeByPID(for pids: Set<Int32>) -> [Int32: UInt64] {
+        var totals: [Int32: UInt64] = [:]
+
+        for pid in pids where pid > 0 {
+            var usage = rusage_info_v4()
+            let status = withUnsafeMutablePointer(to: &usage) { usagePointer in
+                usagePointer.withMemoryRebound(to: rusage_info_t?.self, capacity: 1) { reboundPointer in
+                    proc_pid_rusage(pid, RUSAGE_INFO_V4, reboundPointer)
+                }
+            }
+            guard status == 0 else { continue }
+
+            totals[pid] = usage.ri_user_time + usage.ri_system_time
+        }
+
+        return totals
     }
 }

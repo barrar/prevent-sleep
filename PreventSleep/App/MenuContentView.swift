@@ -162,21 +162,14 @@ struct CustomDurationView: View {
             Text("Custom Sleep Prevention Duration")
                 .font(.headline)
 
-            HStack(spacing: 12) {
-                Stepper(value: $hours, in: 0...24) {
-                    Text("Hours: \(hours)")
-                }
-            }
-
-            HStack(spacing: 12) {
-                Stepper(value: $minutes, in: 0...59) {
-                    Text("Minutes: \(minutes)")
-                }
-            }
+            HourMinuteInputView(
+                hourRange: 0...24,
+                minuteRange: 0...59,
+                hours: $hours,
+                minutes: $minutes
+            )
 
             let totalSeconds = TimeInterval(hours * 3600 + minutes * 60)
-            Text("Total: \(DurationFormatter.format(seconds: totalSeconds))")
-                .foregroundStyle(.secondary)
 
             HStack {
                 Button("Apply") {
@@ -194,5 +187,50 @@ struct CustomDurationView: View {
             Spacer()
         }
         .padding(20)
+    }
+}
+
+struct HourMinuteInputView: View {
+    let hourRange: ClosedRange<Int>
+    let minuteRange: ClosedRange<Int>
+    @Binding var hours: Int
+    @Binding var minutes: Int
+
+    var body: some View {
+        HStack(alignment: .bottom, spacing: 12) {
+            DurationNumberField(
+                placeholder: "Hours",
+                value: clampedBinding($hours, in: hourRange)
+            )
+
+            DurationNumberField(
+                placeholder: "Minutes",
+                value: clampedBinding($minutes, in: minuteRange)
+            )
+        }
+    }
+
+    private func clampedBinding(_ binding: Binding<Int>, in range: ClosedRange<Int>) -> Binding<Int> {
+        Binding(
+            get: {
+                min(max(binding.wrappedValue, range.lowerBound), range.upperBound)
+            },
+            set: { newValue in
+                binding.wrappedValue = min(max(newValue, range.lowerBound), range.upperBound)
+            }
+        )
+    }
+}
+
+private struct DurationNumberField: View {
+    let placeholder: String
+    @Binding var value: Int
+
+    var body: some View {
+        TextField(placeholder, value: $value, format: .number.grouping(.never))
+            .textFieldStyle(.roundedBorder)
+            .multilineTextAlignment(.center)
+            .monospacedDigit()
+            .frame(width: 108)
     }
 }

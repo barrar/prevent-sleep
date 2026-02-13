@@ -154,6 +154,25 @@ final class RuleMatchingTests: XCTestCase {
         XCTAssertEqual(decoded.cpuUsageThresholdPercent, 2, accuracy: 0.0001)
     }
 
+    func testLegacyGlobalSettingsDecodingDefaultsCPUThresholdFields() throws {
+        let legacyJSON = """
+        {
+          "preventIndefinitely": false,
+          "manualTimerEndDate": null,
+          "globalLidDelayEnabled": false,
+          "globalLidDelaySeconds": 0,
+          "defaultNewRuleMatchMode": "processName",
+          "sleepMode": "systemOnly"
+        }
+        """
+
+        let decoder = JSONDecoder()
+        let decoded = try decoder.decode(GlobalSettings.self, from: Data(legacyJSON.utf8))
+
+        XCTAssertFalse(decoded.allowSleepWhenSystemCPUBelowThreshold)
+        XCTAssertEqual(decoded.systemCPUUsageThresholdPercent, 2, accuracy: 0.0001)
+    }
+
     func testProcessRuleMatchDetailsIncludeAllMatchedPIDsAndWindows() {
         let rule = SleepRule(
             label: "Node Name",

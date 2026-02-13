@@ -122,17 +122,66 @@ struct GlobalSettings: Codable, Equatable {
     var manualTimerEndDate: Date?
     var globalLidDelayEnabled: Bool
     var globalLidDelaySeconds: TimeInterval
+    var allowSleepWhenSystemCPUBelowThreshold: Bool
+    var systemCPUUsageThresholdPercent: Double
     var defaultNewRuleMatchMode: MatchMode
     var sleepMode: SleepMode
+
+    private enum CodingKeys: String, CodingKey {
+        case preventIndefinitely
+        case manualTimerEndDate
+        case globalLidDelayEnabled
+        case globalLidDelaySeconds
+        case allowSleepWhenSystemCPUBelowThreshold
+        case systemCPUUsageThresholdPercent
+        case defaultNewRuleMatchMode
+        case sleepMode
+    }
 
     static let `default` = GlobalSettings(
         preventIndefinitely: false,
         manualTimerEndDate: nil,
         globalLidDelayEnabled: false,
         globalLidDelaySeconds: 0,
+        allowSleepWhenSystemCPUBelowThreshold: false,
+        systemCPUUsageThresholdPercent: 2,
         defaultNewRuleMatchMode: .executablePath,
         sleepMode: .systemOnly
     )
+
+    init(
+        preventIndefinitely: Bool,
+        manualTimerEndDate: Date?,
+        globalLidDelayEnabled: Bool,
+        globalLidDelaySeconds: TimeInterval,
+        allowSleepWhenSystemCPUBelowThreshold: Bool,
+        systemCPUUsageThresholdPercent: Double,
+        defaultNewRuleMatchMode: MatchMode,
+        sleepMode: SleepMode
+    ) {
+        self.preventIndefinitely = preventIndefinitely
+        self.manualTimerEndDate = manualTimerEndDate
+        self.globalLidDelayEnabled = globalLidDelayEnabled
+        self.globalLidDelaySeconds = globalLidDelaySeconds
+        self.allowSleepWhenSystemCPUBelowThreshold = allowSleepWhenSystemCPUBelowThreshold
+        self.systemCPUUsageThresholdPercent = max(systemCPUUsageThresholdPercent, 0)
+        self.defaultNewRuleMatchMode = defaultNewRuleMatchMode
+        self.sleepMode = sleepMode
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        preventIndefinitely = try container.decode(Bool.self, forKey: .preventIndefinitely)
+        manualTimerEndDate = try container.decodeIfPresent(Date.self, forKey: .manualTimerEndDate)
+        globalLidDelayEnabled = try container.decode(Bool.self, forKey: .globalLidDelayEnabled)
+        globalLidDelaySeconds = try container.decode(TimeInterval.self, forKey: .globalLidDelaySeconds)
+        allowSleepWhenSystemCPUBelowThreshold =
+            try container.decodeIfPresent(Bool.self, forKey: .allowSleepWhenSystemCPUBelowThreshold) ?? false
+        systemCPUUsageThresholdPercent =
+            max(try container.decodeIfPresent(Double.self, forKey: .systemCPUUsageThresholdPercent) ?? 2, 0)
+        defaultNewRuleMatchMode = try container.decode(MatchMode.self, forKey: .defaultNewRuleMatchMode)
+        sleepMode = try container.decode(SleepMode.self, forKey: .sleepMode)
+    }
 }
 
 struct PersistedState: Codable {

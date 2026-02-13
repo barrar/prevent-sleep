@@ -62,6 +62,26 @@ struct AdvancedSettingsView: View {
                 }
             }
 
+            Toggle("Allow Sleep When 5-Min Peak System CPU Drops Below Threshold", isOn: Binding(
+                get: { appState.globalSettings.allowSleepWhenSystemCPUBelowThreshold },
+                set: {
+                    appState.setGlobalCPUAllowance(
+                        enabled: $0,
+                        thresholdPercent: appState.globalSettings.systemCPUUsageThresholdPercent
+                    )
+                }
+            ))
+
+            VStack(alignment: .leading, spacing: 6) {
+                Stepper(value: globalCPUThresholdBinding, in: 0...100, step: 2) {
+                    Text("System CPU Threshold: \(appState.globalSettings.systemCPUUsageThresholdPercent, specifier: "%.0f")%")
+                }
+                Text("Current 1-Min Peak System CPU: \(oneMinuteSystemPeakLabel)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .disabled(!appState.globalSettings.allowSleepWhenSystemCPUBelowThreshold)
+
             Toggle("Enable Global Lid-Close Delay", isOn: Binding(
                 get: { appState.globalSettings.globalLidDelayEnabled },
                 set: { appState.setGlobalLidDelay(enabled: $0, seconds: appState.globalSettings.globalLidDelaySeconds) }
@@ -207,6 +227,25 @@ struct AdvancedSettingsView: View {
         }
         NSWorkspace.shared.open(url)
     }
+
+    private var globalCPUThresholdBinding: Binding<Double> {
+        Binding(
+            get: { appState.globalSettings.systemCPUUsageThresholdPercent },
+            set: { newValue in
+                appState.setGlobalCPUAllowance(
+                    enabled: appState.globalSettings.allowSleepWhenSystemCPUBelowThreshold,
+                    thresholdPercent: max(newValue, 0)
+                )
+            }
+        )
+    }
+
+    private var oneMinuteSystemPeakLabel: String {
+        guard let value = appState.currentSystemPeakCPUUsageLastMinutePercent else {
+            return "Collecting samples..."
+        }
+        return String(format: "%.1f%%", value)
+    }
 }
 
 private struct RuleEditorView: View {
@@ -252,10 +291,10 @@ private struct RuleEditorView: View {
                     isOn: $rule.allowSleepWhenCPUPeakDropsBelowThreshold
                 )
                 VStack(alignment: .leading, spacing: 6) {
-                    Stepper(value: cpuThresholdBinding, in: 0.5...100, step: 0.5) {
-                        Text("CPU Threshold: \(rule.cpuUsageThresholdPercent, specifier: "%.1f")%")
+                    Stepper(value: cpuThresholdBinding, in: 0...100, step: 2) {
+                        Text("CPU Threshold: \(rule.cpuUsageThresholdPercent, specifier: "%.0f")%")
                     }
-                    Text("Current 1-Min Peak CPU: \(oneMinutePeakLabel)")
+                    Text("Current 1-Min Peak CPU (Matched PIDs Total): \(oneMinutePeakLabel)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -306,7 +345,7 @@ private struct RuleEditorView: View {
     }
 
     private var oneMinutePeakLabel: String {
-        guard let value = appState.currentPeakCPUUsageLastMinutePercent else {
+        guard let value = appState.rulePeakCPUUsageLastMinutePercent(for: rule.id) else {
             return "Collecting samples..."
         }
         return String(format: "%.1f%%", value)
@@ -316,21 +355,18 @@ private struct RuleEditorView: View {
 private struct DurationEditor: View {
     let title: String
     @Binding var seconds: TimeInterval
+    private let hourRange = 0...72
+    private let minuteRange = 0...59
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
-            HStack {
-                Stepper(value: hoursBinding, in: 0...72) {
-                    Text("Hours: \(hoursBinding.wrappedValue)")
-                }
-                Stepper(value: minutesBinding, in: 0...59) {
-                    Text("Minutes: \(minutesBinding.wrappedValue)")
-                }
-            }
-            Text("Total: \(DurationFormatter.format(seconds: seconds))")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            HourMinuteInputView(
+                hourRange: hourRange,
+                minuteRange: minuteRange,
+                hours: hoursBinding,
+                minutes: minutesBinding
+            )
         }
     }
 
@@ -340,8 +376,9 @@ private struct DurationEditor: View {
                 Int(max(seconds, 0)) / 3600
             },
             set: { newHours in
+                let clampedHours = min(max(newHours, hourRange.lowerBound), hourRange.upperBound)
                 let minutes = Int(max(seconds, 0)) % 3600 / 60
-                seconds = TimeInterval(max(0, newHours) * 3600 + max(0, minutes) * 60)
+                seconds = TimeInterval(clampedHours * 3600 + max(0, minutes) * 60)
             }
         )
     }
@@ -352,8 +389,10 @@ private struct DurationEditor: View {
                 Int(max(seconds, 0)) % 3600 / 60
             },
             set: { newMinutes in
+                let clampedMinutes = min(max(newMinutes, minuteRange.lowerBound), minuteRange.upperBound)
                 let hours = Int(max(seconds, 0)) / 3600
-                seconds = TimeInterval(max(0, hours) * 3600 + max(0, newMinutes) * 60)
+                let clampedHours = min(max(hours, hourRange.lowerBound), hourRange.upperBound)
+                seconds = TimeInterval(clampedHours * 3600 + clampedMinutes * 60)
             }
         )
     }

@@ -63,14 +63,14 @@ final class MockWindowScanner: WindowScanning {
 }
 
 final class MockCPUSampler: CPUUsageSampling {
-    var queuedSamples: [Double?] = []
-    var fallbackSample: Double?
+    var queuedSnapshots: [CPUUsageSnapshot] = []
+    var fallbackSnapshot = CPUUsageSnapshot(systemPercent: nil, pidPercentages: [:])
 
-    func sampleSystemCPUPercent() -> Double? {
-        if !queuedSamples.isEmpty {
-            return queuedSamples.removeFirst()
+    func sampleCPUUsage(forPIDs pids: Set<Int32>) -> CPUUsageSnapshot {
+        if !queuedSnapshots.isEmpty {
+            return queuedSnapshots.removeFirst()
         }
-        return fallbackSample
+        return fallbackSnapshot
     }
 }
 
